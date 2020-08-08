@@ -1,9 +1,13 @@
 package com.example.springbootimageuploader;
 
+import com.example.springbootimageuploader.model.AppUser;
 import com.example.springbootimageuploader.model.UserDetailsServiceImpl;
+import com.example.springbootimageuploader.repository.AppUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -18,10 +22,15 @@ import java.util.Collections;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsServiceImpl userDetailsServiceImpl;
+    private AppUserRepository appUserRepository;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, AppUserRepository appUserRepository,
+                             PasswordEncoder passwordEncoder) {
         this.userDetailsServiceImpl= userDetailsServiceImpl;
+        this.appUserRepository = appUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -40,5 +49,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void createDefaultUser() {
+        AppUser appUser = new AppUser("Jan", passwordEncoder.encode("Nowak"), "User");
+        appUserRepository.save(appUser);
     }
 }

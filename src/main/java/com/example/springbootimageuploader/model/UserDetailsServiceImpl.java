@@ -18,12 +18,10 @@ import java.util.Collections;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     private AppUserRepository appUserRepository;
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserDetailsServiceImpl(AppUserRepository appUserRepository, PasswordEncoder passwordEncoder) {
+    public UserDetailsServiceImpl(AppUserRepository appUserRepository) {
         this.appUserRepository = appUserRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -31,9 +29,4 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return appUserRepository.findAppUserByUserName(s);
     }
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void createDefaultUser() {
-        AppUser appUser = new AppUser("Jan", passwordEncoder.encode("Nowak"), "User");
-        appUserRepository.save(appUser);
-    }
 }
