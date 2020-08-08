@@ -23,14 +23,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private UserDetailsServiceImpl userDetailsServiceImpl;
     private AppUserRepository appUserRepository;
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, AppUserRepository appUserRepository,
-                             PasswordEncoder passwordEncoder) {
+    public WebSecurityConfig(UserDetailsServiceImpl userDetailsServiceImpl, AppUserRepository appUserRepository) {
         this.userDetailsServiceImpl= userDetailsServiceImpl;
         this.appUserRepository = appUserRepository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -53,7 +50,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @EventListener(ApplicationReadyEvent.class)
     public void createDefaultUser() {
-        AppUser appUser = new AppUser("Jan", passwordEncoder.encode("Nowak"), "User");
+        AppUser appUser = new AppUser("Jan", passwordEncoder().encode("Nowak"), "User");
         appUserRepository.save(appUser);
     }
 }
